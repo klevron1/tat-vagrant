@@ -28,7 +28,7 @@ https://atlas.hashicorp.com/bento/
 
 3. Connect to vagrant VM via SSH
 
-  `vagrant ssh`
+    `vagrant ssh`
 
 4. Get the account registration validation URL from /var/log/tat.log
 
