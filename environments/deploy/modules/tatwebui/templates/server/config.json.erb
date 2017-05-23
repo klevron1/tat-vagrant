@@ -1,0 +1,17 @@
+{
+ "proxy": {
+   "tatEngine": {
+     "scheme": "<%= @tat_scheme %>",
+     "host": "<%= @tat_server %>",
+     "port": <%= @tat_port %>,
+     "sslInsecureSkipVerify": false
+   },
+   "listen_port": 8001
+ },
+ "filesystem": {
+     "listen_port": <%= @tatwebui_port %>
+ },
+ "process": {
+   "nb_forks": "2"
+ }
+}

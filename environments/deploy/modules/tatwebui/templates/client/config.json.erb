@@ -1,0 +1,46 @@
+{
+  "backend": {
+    "scheme": "<%= @tat_scheme %>",
+    "host": "<%= @tat_server %>",
+    "port": <%= @tat_port %>,
+    "autologin": false
+  },
+  "releaseview": {
+    "tracker": "https://github.com/ovh/tat/issues/",
+    "keyword": "github"
+  },
+  "help": {
+    "signup": ["l'aide ici"]
+  },
+  "links": {
+    "home": [{
+      "caption": "label home 1",
+      "url": "http://tat-engine.tat.tat.home1"
+    }, {
+      "caption": "label home 2",
+      "url": "http://tat-engine.tat.tat.home2"
+    }],
+    "menu": [{
+      "caption": "label 1",
+      "url": "http://tat-engine.tat.tat.label1"
+    }, {
+      "caption": "label 2",
+      "url": "http://tat-engine.tat.tat.label2"
+    }]
+  },
+  "viewconfigs": {
+    "standardview-list": {
+      "filters": {
+        "placeholder": {
+          "text": "text",
+          "label": "open,doing",
+          "andLabel": "open,doing",
+          "notLabel": "done",
+          "tag": "PCC,STOCKAGE",
+          "andTag": "PCC,STOCKAGE",
+          "notTag": "PCC,STOCKAGE"
+        }
+      }
+    }
+  }
+}
