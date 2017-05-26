@@ -2,7 +2,6 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.synced_folder "data/", "/home/vagrant/data"
   config.vm.define :'tat-dev' do |m|
     m.vm.box = "bento/centos-7.3"
 
