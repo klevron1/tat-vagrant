@@ -8,6 +8,7 @@ class tatwebui (
   $tat_port = 8080,
   $tat_scheme = 'http',
   $install_path = '/opt/tatwebui',
+  $tatwebui_user = 'tatwebui',
 ) {
   package { 'git':
     ensure   => installed,
@@ -37,59 +38,79 @@ class tatwebui (
     provider => 'npm',
   }
 
-  vcsrepo {'/opt/tatwebui':
+  group { $tatwebui_user:
+    ensure => present,
+  }
+
+  user { $tatwebui_user:
+    ensure  => present,
+    home    => $install_path,
+    require => Group[$tatwebui_user]
+  }
+
+  vcsrepo { $install_path:
     ensure   => present,
     provider => git,
     source   => 'git://github.com/ovh/tatwebui.git',
-    owner    => 'vagrant',
-    require  => [ Package['bower'], Package['grunt-cli'] ]
+    owner    => $tatwebui_user,
+    require  => [ Package['bower'], Package['grunt-cli'], User[$tatwebui_user] ]
   }
 
   file { 'client/config.json':
     ensure  => file,
     path    => "${install_path}/client/src/assets/config.json",
-    owner   => 'vagrant',
-    group   => 'vagrant',
+    owner   => $tatwebui_user,
+    group   => $tatwebui_user,
     mode    => '0644',
     content => template('tatwebui/client/config.json.erb'),
-    require => Vcsrepo['/opt/tatwebui'],
+    require => Vcsrepo[$install_path],
   }
 
   file { 'client/plugin.tpl.json':
     ensure  => file,
     path    => "${install_path}/client/plugin.tpl.json",
-    owner   => 'vagrant',
-    group   => 'vagrant',
+    owner   => $tatwebui_user,
+    group   => $tatwebui_user,
     mode    => '0644',
     content => template('tatwebui/client/plugin.tpl.json.erb'),
-    require => Vcsrepo['/opt/tatwebui'],
+    require => Vcsrepo[$install_path],
   }
 
   file { 'client/custom.plugin.tpl.json':
     ensure  => file,
     path    => "${install_path}/client/custom.plugin.tpl.json",
-    owner   => 'vagrant',
-    group   => 'vagrant',
+    owner   => $tatwebui_user,
+    group   => $tatwebui_user,
     mode    => '0644',
     content => '{}',
-    require => Vcsrepo['/opt/tatwebui'],
+    require => Vcsrepo[$install_path],
   }
 
   file { 'server/config.json':
     ensure  => file,
     path    => "${install_path}/server/app/config.json",
-    owner   => 'vagrant',
-    group   => 'vagrant',
+    owner   => $tatwebui_user,
+    group   => $tatwebui_user,
     mode    => '0644',
     content => template('tatwebui/server/config.json.erb'),
-    require => Vcsrepo['/opt/tatwebui'],
+    require => Vcsrepo[$install_path],
+  }
+
+  file { 'tatwebui init script':
+    ensure  => file,
+    path    => '/etc/init.d/tat-webui',
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template('tatwebui/tat-webui.erb'),
+    require => Vcsrepo[$install_path],
   }
 
   exec { 'tatwebui release':
-    command => 'cd /opt/tatwebui && make release',
-    user    => 'vagrant',
+    command => "cd ${install_path} && make release",
+    user    => $tatwebui_user,
     path    => '/usr/bin:/usr/sbin:/bin',
-    onlyif  => ['test ! -d /opt/tatwebui/.dist'],
+    onlyif  => ["test ! -d ${install_path}/.dist"],
     require => [ File['client/config.json'],
                   File['client/plugin.tpl.json'],
                   File['client/custom.plugin.tpl.json'],
@@ -97,12 +118,9 @@ class tatwebui (
                 ],
   }
 
-  service { 'tatwebui':
+  service { 'tat-webui':
     ensure   => running,
-    provider => 'base',
-    start    => 'su - vagrant -c "cd /opt/tatwebui && make run" &',
-    stop     => 'pkill -o node',
-    status   => 'pgrep -o node > /dev/null',
-    require  => Exec['tatwebui release'],
+    provider => 'redhat',
+    require  => [ Exec['tatwebui release'], File['tat-webui init script'] ],
   }
 }

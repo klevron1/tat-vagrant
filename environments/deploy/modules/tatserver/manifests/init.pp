@@ -23,7 +23,7 @@ class tatserver (
     require => Exec['download tat'],
   }
 
-  file { 'init script':
+  file { 'tat-server init script':
     ensure  => file,
     path    => '/etc/init.d/tat-server',
     owner   => 'root',
@@ -33,7 +33,7 @@ class tatserver (
     require => File['tat binary'],
   }
 
-  file { 'sysconfig':
+  file { 'tat-server sysconfig':
     ensure  => file,
     path    => '/etc/sysconfig/tat-server',
     owner   => 'root',
@@ -46,7 +46,7 @@ class tatserver (
   service { 'tat-server':
     ensure   => running,
     provider => 'redhat',
-    require  => [ File['tat binary'], File['init script'], Service['mongod'] ],
+    require  => [ File['tat binary'], File['tat-server init script'], Service['mongod'] ],
   }
 
   # Mongodb community edition
