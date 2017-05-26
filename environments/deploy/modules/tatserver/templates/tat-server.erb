@@ -20,12 +20,17 @@ if [ -f /etc/sysconfig/tat-server ] ; then
   . /etc/sysconfig/tat-server
 fi
 
+OPT=""
+if [ "$TAT_NO_SMTP" = "true" ]; then
+  OPT="--no-smtp"
+fi
+
 set -e
 
 case "$CMD" in
   start)
   echo -n "Starting $DESC: "
-  nohup $DAEMON > /var/log/tat.log 2>&1 &
+  nohup $DAEMON $OPT > /var/log/tat.log 2>&1 &
   echo "$NAME."
   ;;
   stop)
@@ -36,7 +41,7 @@ case "$CMD" in
   restart)
   echo -n "Restarting $DESC: "
   pkill $BINARY
-  nohup $DAEMON > /var/log/tat.log 2>&1 &
+  nohup $DAEMON $OPT > /var/log/tat.log 2>&1 &
   echo "$NAME."
   ;;
   status)
