@@ -121,6 +121,6 @@ class tatwebui (
   service { 'tat-webui':
     ensure   => running,
     provider => 'redhat',
-    require  => [ Exec['tatwebui release'], File['tat-webui init script'] ],
+    require  => [ Exec['tatwebui release'], File['tatwebui init script'] ],
   }
 }

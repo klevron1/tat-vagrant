@@ -127,9 +127,11 @@ status_app() {
             echo "$APP_NAME running with pid $PID"
         else
             echo "$APP_NAME stopped, but pid file exists"
+            exit 1
         fi
     else
         echo "$APP_NAME stopped"
+        exit 1
     fi
 }
 
