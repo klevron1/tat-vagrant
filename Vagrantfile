@@ -28,7 +28,7 @@ Vagrant.configure("2") do |config|
       puppet.environment_path = "environments"
       puppet.environment = "deploy"
       puppet.working_directory = '/tmp/vagrant-puppet/environments/deploy'
-      puppet.options = '--verbose --debug'
+      puppet.options = '--verbose'
     end
   end
 end
