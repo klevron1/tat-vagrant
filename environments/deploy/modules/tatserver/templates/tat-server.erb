@@ -1,0 +1,60 @@
+#! /bin/bash
+#
+# tat-server   This shell script takes care of starting and stopping
+#                 the tat server.
+#
+# chkconfig: 2345 80 20
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+BINARY=tat-linux-amd64
+DAEMON="<%= @install_path %>/$BINARY"
+NAME=tat-server
+DESC=tat-server
+
+test -x $DAEMON || exit 0
+
+CMD="$1"
+
+# Include tat-server defaults if available
+if [ -f /etc/sysconfig/tat-server ] ; then
+  . /etc/sysconfig/tat-server
+fi
+
+set -e
+
+case "$CMD" in
+  start)
+  echo -n "Starting $DESC: "
+  nohup $DAEMON > /var/log/tat.log 2>&1 &
+  echo "$NAME."
+  ;;
+  stop)
+  echo -n "Stopping $DESC: "
+  pkill $BINARY
+  echo "$NAME."
+  ;;
+  restart)
+  echo -n "Restarting $DESC: "
+  pkill $BINARY
+  nohup $DAEMON > /var/log/tat.log 2>&1 &
+  echo "$NAME."
+  ;;
+  status)
+  echo -n "Checking $DESC: "
+  if pgrep $BINARY > /dev/null; then
+    echo "running."
+    exit 0
+  else
+    echo "not running."
+    exit 1
+  fi
+  ;;
+  *)
+  N=/etc/init.d/$NAME
+  # echo "Usage: $N {start|stop|restart|status}" >&2
+  echo "Usage: $N {start|stop|restart|status}" >&2
+  exit 1
+  ;;
+esac
+
+exit 0

@@ -8,28 +8,45 @@ class tatserver (
   $mongod_version = '3.4',
   $tat_version = '5.5.2',
 ) {
-  # Download, install and start the tat server binary
+  # Download, install and start the tat binary binary
   exec { 'download tat':
     command => "curl -L https://github.com/ovh/tat/releases/download/v${tat_version}/tat-linux-amd64 > ${install_path}/tat-linux-amd64",
     path    => '/usr/bin:/usr/sbin:/bin',
     onlyif  => ["test ! -f ${install_path}/tat-linux-amd64"],
   }
 
-  file { 'tat server':
+  file { 'tat binary':
     ensure  => file,
     name    => "${install_path}/tat-linux-amd64",
-    mode    => '0744',
+    mode    => '0755',
     owner   => 'root',
     require => Exec['download tat'],
   }
 
-  service { 'tat service':
+  file { 'init script':
+    ensure  => file,
+    path    => '/etc/init.d/tat-server',
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template('tatserver/tat-server.erb'),
+    require => File['tat binary'],
+  }
+
+  file { 'sysconfig':
+    ensure  => file,
+    path    => '/etc/sysconfig/tat-server',
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template('tatserver/sysconfig.erb'),
+    require => File['tat binary'],
+  }
+
+  service { 'tat-server':
     ensure   => running,
-    provider => 'base',
-    start    => "${install_path}/tat-linux-amd64 --no-smtp > /var/log/tat.log 2>&1 &",
-    stop     => 'pkill tat-linux-amd64',
-    status   => 'pgrep tat-linux-amd64 > /dev/null',
-    require  => [ File['tat server'], Service['mongod'] ],
+    provider => 'redhat',
+    require  => [ File['tat binary'], File['init script'], Service['mongod'] ],
   }
 
   # Mongodb community edition

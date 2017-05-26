@@ -9,10 +9,9 @@ class { '::tatserver::tatcli':
 
 # Install and configure tatserver
 class { '::tatserver':
-  # Not used currently
-  # tat_server     => 'localhost',
-  # tat_port       => 8080,
-  # tat_scheme     => 'http',
+  tat_server     => 'localhost',
+  tat_port       => 8080,
+  tat_scheme     => 'http',
   install_path   => '/opt',
   mongod_version => $mongod_version,
   tat_version    => $tat_version,
